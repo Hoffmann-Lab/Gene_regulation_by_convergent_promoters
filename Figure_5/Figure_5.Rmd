@@ -1,0 +1,74 @@
+---
+title: "Figure_5"
+date: "2024-10-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      fig.width = 7,
+                      fig.height = 7)
+source('../libraries.R')
+
+```
+
+# Figure 5a
+
+```
+computeMatrix reference-point -R convergentPromoters_core.bed -S ENCFF782BVX.bigWig --referencePoint TSS -a 500 -b 2500 --skipZeros -o matrix.gz
+plotHeatmap -m matrix.gz --sortUsing region_length --colorList 'white,blue'
+```
+
+# Figure 5a-g
+
+```
+
+computeMatrix scale-regions -R convergentPromoters_core.bed -S ENCODE.bigWig -a 3000 -b 3000 --regionBodyLength 3000 --skipZeros -o matrix.gz
+plotHeatmap -m matrix.gz --sortUsing region_length --colorList 'white,blue'
+```
+
+# Figure 5h
+
+
+```{r}
+figure_5_h <- read_excel("Source_Data_Figure_5.xlsx", sheet = 'Figure5h' )
+
+	ggscatter(
+		figure_5_h,
+		x = "log2FoldChange_firstpromoter",
+		y = "log2FoldChange_secondpromoter",
+		cor.coef = FALSE,
+		conf.int = FALSE,
+		cor.method = "spearman",
+		color = "#b8b8b7",
+		alpha = 0.7,
+		size = 1.5,
+	) +
+	geom_smooth(method = lm, colour = "#899DA4") +
+	stat_quadrant_counts(color = "#899DA4", size = 6) +
+	geom_hline(yintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	geom_vline(xintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	stat_cor(method ="spearman", 
+					 color = "#899DA4", label.x =-1, label.y = -2.7, size = 6) + 
+	labs(x = expression(paste("Upstream promoter(Log"[2], "FC)")),
+			 y = expression(paste("Downstream promoter(Log"[2], "FC)"))) +
+	theme_classic() + theme(
+		axis.title.x = element_text(size = 16),
+		axis.title.y = element_text(size = 16),
+		axis.text.x = element_text(size = 18),
+		axis.text.y = element_text(size = 18)
+	) + geom_density_2d(size = 0.8, colour = "#899DA4")
+```
+
+# Figure 5j
+
+```
+computeMatrix reference-point -R convergentPromoters_extended.bed -S CpG.bigWig --referencePoint TSS -a 500 -b 3000 --skipZeros -o matrix.gz
+plotHeatmap -m matrix.gz --sortUsing region_length --colorList 'white,blue'
+
+```

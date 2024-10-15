@@ -1,0 +1,182 @@
+---
+title: "Supplemental_Figure_5"
+date: "2024-10-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      fig.width = 15,
+                      fig.height = 10)
+source('../libraries.R')
+
+
+```
+
+# Supplemental Figure 5a and 5b
+
+The figure are divided in two columns (a and b) and three rows for the cell lines MCF-7, U2OS, and RPE-1
+
+
+## MCF7 a and b
+
+```{r}
+sfigure_5_MCF7 <- read_excel("Source_Data_Extended_Data_Figure_5.xlsx", sheet = 'ExtDataFig5a-b_MCF7' )
+
+
+host_CAGE_plot <- function(PromoterPairs, celltype){
+	x <- c(min(PromoterPairs$lfc_gene, na.rm = TRUE), max(PromoterPairs$lfc_gene, na.rm = TRUE))
+	
+	y <- c( min(PromoterPairs$second_peak_l2fc, na.rm = TRUE), max(PromoterPairs$second_peak_l2fc, na.rm = TRUE),
+					min(PromoterPairs$third_peak_l2fc, na.rm = TRUE), max(PromoterPairs$third_peak_l2fc, na.rm = TRUE))
+	
+	label_x <- case_match(celltype,
+												"MCF7" ~ -2,
+												"U2OS" ~ -2.8,
+												"RPE1" ~ -1.9)
+	label_y <- case_match(celltype,
+												"MCF7" ~ -3.95,
+												"U2OS" ~ -5.75,
+												"RPE1" ~ -5.45)
+	
+	host_gene_TSS2_plot <-
+		ggscatter(
+			PromoterPairs,
+			x = "lfc_gene",
+			y = "second_peak_l2fc",
+			cor.coef = FALSE,
+			conf.int = FALSE,
+			cor.method = "spearman",
+			color = "#b8b8b7",
+			alpha = 0.7,
+			size = 1.5,
+		) +
+		geom_smooth(method = lm, colour = "#899DA4") +
+		stat_quadrant_counts(color = "#899DA4", size = 6) +
+		geom_hline(yintercept = 0,
+							 colour = "#899DA4",
+							 alpha = 0.7) +
+		stat_cor(method ="spearman", color = "#899DA4", label.x =label_x, label.y = label_y, size = 6) +
+		geom_vline(xintercept = 0,
+							 colour = "#899DA4",
+							 alpha = 0.7) +
+		labs(x = expression(paste("Host Gene(Log"[2], "FC)")),
+				 y = expression(paste("TSS#2(Log"[2], "FC)"))) +
+		scale_x_continuous(limits = c(min(x), max(x)), breaks = seq(-6, 8, by =2)) +
+		scale_y_continuous(limits = c(min(y), max(y)), breaks = seq(-6, 8, by =2)) +
+		theme_classic() + theme(
+			axis.title.x = element_text(size = 16),
+			axis.title.y = element_text(size = 16),
+			axis.text.x = element_text(size = 18),
+			axis.text.y = element_text(size = 18)
+		) + geom_density_2d(size = 1, colour = "#899DA4")
+	host_gene_TSS2_plot <- rasterize(host_gene_TSS2_plot, dpi = 300)
+	host_gene_TSS3_plot <-
+		ggscatter(
+			PromoterPairs,
+			x = "lfc_gene",
+			y = "third_peak_l2fc",
+			cor.coef = FALSE,
+			conf.int = FALSE,
+			cor.method = "spearman",
+			color = "#b8b8b7",
+			alpha = 0.7,
+			size = 1.5,
+		) +
+		geom_smooth(method = lm, colour = "#899DA4") +
+		#scale_x_log10() +
+		stat_quadrant_counts(color = "#899DA4", size = 6) +
+		geom_hline(yintercept = 0,
+							 colour = "#899DA4",
+							 alpha = 0.7) +
+		geom_vline(xintercept = 0,
+							 colour = "#899DA4",
+							 alpha = 0.7) +
+		stat_cor(method ="spearman", color = "#899DA4", label.x =label_x, label.y = label_y, size = 6) +
+		labs(x = expression(paste("Host Gene(Log"[2], "FC)")),
+				 y = expression(paste("TSS#3(Log"[2], "FC)"))) +
+		scale_x_continuous(limits = c(min(x), max(x)), breaks = seq(-6, 8, by =2)) +
+		scale_y_continuous(limits = c(min(y), max(y)), breaks = seq(-6, 8, by =2)) +
+		theme_classic() + theme(
+			axis.title.x = element_text(size = 16),
+			axis.title.y = element_text(size = 16),
+			axis.text.x = element_text(size = 18),
+			axis.text.y = element_text(size = 18)
+		) + geom_density_2d(size = 1, colour = "#899DA4")
+	host_gene_TSS3_plot <- rasterize(host_gene_TSS3_plot, dpi = 300)
+	arranged_host <- ggarrange(host_gene_TSS2_plot, host_gene_TSS3_plot, ncol = 2,common.legend = TRUE)
+	return(arranged_host)
+}
+
+host_CAGE_plot(sfigure_5_MCF7, "MCF7")
+
+
+```
+
+## U2OS a and b
+
+```{r}
+sfigure_5_U2OS <- read_excel("Source_Data_Extended_Data_Figure_5.xlsx", sheet = 'ExtDataFig5a-b_U2OS' )
+
+
+
+host_CAGE_plot(sfigure_5_U2OS, "U2OS")
+
+```
+
+
+## RPE-1 a and b
+
+```{r}
+sfigure_5_RPE1 <- read_excel("Source_Data_Extended_Data_Figure_5.xlsx", sheet = 'ExtDataFig5a-b_RPE-1' )
+
+
+
+host_CAGE_plot(sfigure_5_RPE1, "RPE1")
+
+```
+
+# Supplemental Figure 5c
+
+```{r}
+
+sfigure_5_c <- read_excel("Source_Data_Extended_Data_Figure_5.xlsx", sheet = 'ExtDataFig5c' )
+sfigure_5_c$log2FoldChange_antisense <- as.numeric(sfigure_5_c$log2FoldChange_antisense)
+
+
+	ggscatter(
+		sfigure_5_c,
+		x = "log2FoldChange_sense",
+		y = "log2FoldChange_antisense",
+		cor.coef = FALSE,
+		conf.int = FALSE,
+		cor.method = "spearman",
+		color = "#b8b8b7",
+		alpha = 0.7,
+		size = 1.5,
+	) +
+	geom_smooth(method = lm, colour = "#899DA4") +
+	stat_quadrant_counts(color = "#899DA4", size = 6) +
+	geom_hline(yintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	geom_vline(xintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	stat_cor(method ="spearman", 
+					 color = "#899DA4", label.x =-1.5, label.y = -2.4, size = 6) + 
+	labs(x = expression(paste("cP host strand(Log"[2], "FC)")),
+			 y = expression(paste("cP antisense(Log"[2], "FC)"))) +
+	scale_x_continuous(limits = c(-2.5, 2.5), breaks = seq(-4, 8, by =2)) +
+	scale_y_continuous(limits = c(-2.5, 2.5), breaks = seq(-4, 8, by =2)) +
+	# scale_x_continuous(limits = c(min(x, na.rm = TRUE), max(x, na.rm = TRUE)), breaks = seq(-4, 8, by =2)) +
+	# scale_y_continuous(limits = c(min(y, na.rm = TRUE), max(y, na.rm = TRUE)), breaks = seq(-4, 8, by =2)) +
+	theme_classic() + theme(
+		axis.title.x = element_text(size = 16),
+		axis.title.y = element_text(size = 16),
+		axis.text.x = element_text(size = 18),
+		axis.text.y = element_text(size = 18)
+	) + geom_density_2d(size = 0.8, colour = "#899DA4")
+
+```

@@ -1,0 +1,433 @@
+---
+title: "Supplemental_Figure_2"
+date: "2024-10-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      fig.width = 15,
+                      fig.height = 7)
+
+source('../libraries.R')
+```
+
+# Supplemental Figure 2a
+
+```{r}
+
+sfigure_2a <- read_excel("Source_Data_Extended_Data_Figure_2.xlsx", sheet = 'ExtDataFig2a') 
+
+sfigure_2a$celltype <- factor(sfigure_2a$celltype, levels = c('MCF7', 'U2OS', 'RPE1'))
+sfigure_2a$included_biotype <- factor(sfigure_2a$included_biotype, levels = rev(c(
+    "protein_coding", "lncRNA", "others", "N/A"
+)))
+sfigure_2a$TSS <- factor(sfigure_2a$TSS, levels = c('first', 'second', 'third', "fourth"))
+
+ ggplot(sfigure_2a, aes(x=TSS, y=count, fill=included_biotype))+
+	geom_bar(stat = "identity") + 
+	facet_wrap(~celltype,) +
+	xlab("")+ ylab("count")+ labs(fill = "Biotypes") +
+	theme_classic() + theme(legend.position="bottom",
+													legend.box.spacing = unit(-8, "pt"),
+													axis.title.y = element_text(size = 18, vjust = -1),
+													axis.text.x = element_text(size = 18),
+													axis.text.y = element_text(size = 18),
+													legend.title=element_text(size=16),
+													legend.text=element_text(size=16),
+													strip.text = element_text(size = 16, face = "bold"),
+													strip.background = element_blank(),
+													axis.ticks.x = element_blank()) +
+	scale_x_discrete(labels=c("first" = "TSS#1", "second" = "TSS#2",
+														"third" = "TSS#3", "fourth" = "TSS#4")) +
+	scale_y_continuous(expand = c(0,5),
+										 breaks = c(0,200, 400, 600, 800, 1000, 1200, 1400)) + 
+	scale_fill_manual(values= c( "#b8b8b7", "#ee9b00","#ca6702","#BB3E03"),
+										guide = guide_legend(reverse = TRUE))
+```
+
+
+# Supplemental Figure 2b
+
+```{r}
+
+sfigure_2b <- read_excel("Source_Data_Extended_Data_Figure_2.xlsx", sheet = 'ExtDataFig2b') 
+
+my_palette = c("#F5B700", "#7AD151", "#22A884","#2A788E",
+							  "#414487", "#440154")
+# "#F6AE2D"
+
+### plot
+level_celltype <- c("MCF-7", "U2OS", "RPE-1")
+level_region <- c("5'UTR", "CDS", "3'UTR","exon",
+									"intron", "intergenic")
+
+ggplot(sfigure_2b, aes(
+    x = number,
+    fill = factor(intersection_mod, level = level_region)
+)) +
+    geom_bar(position = "fill") +
+    xlab("") + ylab("Proportion") +
+    scale_y_continuous(expand = c(0, 0), labels = scales::percent) +
+    scale_fill_manual(values = my_palette, name = "TSS located in") +
+    facet_wrap( ~ factor(celltype, level = level_celltype), labeller = as_labeller(c(
+        "MCF-7" = paste0("MCF-7(n=", nrow(sfigure_2b[sfigure_2b$celltype == "MCF-7", ]) /
+                             4, ")"),
+        "U2OS" = paste0("U2OS(n=", nrow(sfigure_2b[sfigure_2b$celltype ==
+                                                       "U2OS", ]) / 4, ")"),
+        "RPE-1" = paste0("RPE1(n=", nrow(sfigure_2b[sfigure_2b$celltype ==
+                                                         "RPE-1", ]) / 4, ")")
+    ))) +
+    theme_classic() + theme(
+        axis.title.x = element_text(size = 18),
+        axis.title.y = element_text(size = 18),
+        axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18),
+        strip.text = element_text(size = 16, face = "bold"),
+        strip.background = element_blank(),
+        axis.ticks.x = element_blank()
+    )
+```
+
+# Supplemental Figure 2c
+
+```{r, fig.width=10}
+
+sfigure_2c <- read_excel("Source_Data_Extended_Data_Figure_2.xlsx", sheet = 'ExtDataFig2c') 
+
+MCF7_pie <- ggplot(sfigure_2c %>% filter(cell_type == "MCF7"), aes(x="", y=value, fill=group))+
+	ylab("") + xlab("") + theme_minimal() + 
+	geom_bar(width = 1, stat = "identity")+ coord_polar("y", start=0) +
+	scale_fill_manual(values = c("#90E0EF","#00B4D8","#0077B6"), 
+										labels = c("in an exon/intron boundary", "in an intron/exon boundary", "not in an exon/intron boundary"), 
+										name = "TSS located...") + 
+	geom_text(aes(y = c(200, 3850, 2000), label = percent(round(percentage, 2))), size=5, color = "white")
+
+
+U2OS_pie <- ggplot(sfigure_2c %>% filter(cell_type == "U2OS"), aes(x="", y=value, fill=group))+
+		ylab("") + xlab("") + theme_minimal() + 
+	geom_bar(width = 1, stat = "identity")+ coord_polar("y", start=0) +
+	scale_fill_manual(values = c("#90E0EF","#00B4D8","#0077B6"), 
+										labels = c("in an exon/intron boundary", "in an intron/exon boundary", "not in an exon/intron boundary"), 
+										name = "TSS located...") + 
+	geom_text(aes(y = c(300, 5250, 2800), label = percent(round(percentage, 2))), size=5, color = "white")
+
+RPE1_pie <- ggplot(sfigure_2c %>% filter(cell_type == "RPE1"), aes(x="", y=value, fill=group))+
+		ylab("") + xlab("") + theme_minimal() + 
+	geom_bar(width = 1, stat = "identity")+ coord_polar("y", start=0) +
+	scale_fill_manual(values = c("#90E0EF","#00B4D8","#0077B6"), 
+										labels = c("in an exon/intron boundary", "in an intron/exon boundary", "not in an exon/intron boundary"), 
+										name = "TSS located...") +
+	geom_text(aes(y = c(150, 2650,1400), label = percent(round(percentage,2))), size=5, color = "white")
+
+ggarrange(MCF7_pie, U2OS_pie, RPE1_pie, ncol = 3, common.legend = TRUE, labels = c("MCF-7", "U2OS", "RPE-1"), legend = "bottom")
+```
+# Supplemental Figure 2d
+
+```
+
+Create phast Cons profile for TSS:
+########## MCF7 ########
+
+###### PeakPairs MCF7:
+
+computeMatrix scale-regions -S ghg38.phastCons100way.bw \
+                              -R gfirstPeakPairs.bed \
+                              -o gMCF7_firstPeakPairs.mat.gz \
+                              -p 56 --missingDataAsZero --downstream 200 --upstream 500 --skipZeros -bs 1
+                              
+                              
+computeMatrix scale-regions -S ghg38.phastCons100way.bw \
+                              -R gsecondPeakPairs.bed\
+                              -o gMCF7_secondPeakPairs.mat.gz \
+                              -p 56 --missingDataAsZero --downstream 500 --upstream 200 --skipZeros -bs 1 
+
+plotProfile -m gMCF7_firstPeakPairs.mat.gz \
+-out gprofil/MCF7_firstPeakPairs.pdf \
+--samplesLabel "Upstream promoter (MCF-7)" --regionsLabel "" --yAxisLabel "Phast Cons score" \
+--colors "#EE4266" --startLabel "TSS#1" --endLabel "TSS#2" --yMin 0.1 --yMax 0.45 --plotFileFormat "pdf"
+
+plotProfile -m gMCF7_secondPeakPairs.mat.gz \
+-out gprofil/MCF7_secondPeakPairs.pdf \
+--samplesLabel "Downstream promoter (MCF-7)" --regionsLabel "" --yAxisLabel "" \
+--colors "#EE4266" --startLabel "TSS#3" --endLabel "TSS#4" --yMin 0.1 --yMax 0.45 --plotFileFormat "pdf"
+
+
+computeMatrix reference-point -S ghg38.phastCons100way.bw \
+                              -R gTSS_regions/MCF7_SP_TSS1.bed \
+                              gTSS_regions/MCF7_SP_TSS2.bed \
+                              gTSS_regions/MCF7_SP_TSS3.bed \
+                              gTSS_regions/MCF7_SP_TSS4.bed \
+                              -o gMCF7_TSS.mat.gz \
+                              -p 56 --missingDataAsZero --downstream 200 --upstream 200 --skipZeros -bs 1
+                              
+computeMatrix reference-point -S ghg38.phastCons100way.bw \
+                              -R gTSS_regions/MCF7_nonSP_TSS1.bed \
+                              gTSS_regions/MCF7_nonSP_TSS2.bed \
+                              gTSS_regions/MCF7_nonSP_TSS3.bed \
+                              -o gMCF7_nonTSS.mat.gz \
+                              -p 56 --missingDataAsZero --downstream 200 --upstream 200 --skipZeros -bs 1 
+
+computeMatrix reference-point -S ghg38.phastCons100way.bw \
+                              -R gTSS_regions/MCF7_SP_TSS1.bed \
+                              gTSS_regions/MCF7_nonSP_TSS1.bed \
+                              -o gMCF7_TSS1.mat.gz \
+                              -p 56 --missingDataAsZero --downstream 70 --upstream 200 --skipZeros -bs 1 
+
+computeMatrix reference-point -S ghg38.phastCons100way.bw \
+                              -R gTSS_regions/MCF7_SP_TSS2.bed \
+                              gTSS_regions/MCF7_nonSP_TSS2.bed \
+                              -o gMCF7_TSS2.mat.gz \
+                              -p 56 --missingDataAsZero --downstream 200 --upstream 70 --skipZeros -bs 1
+
+computeMatrix reference-point -S ghg38.phastCons100way.bw \
+                              -R gTSS_regions/MCF7_SP_TSS3.bed \
+                              gTSS_regions/MCF7_nonSP_TSS3.bed \
+                              -o gMCF7_TSS3.mat.gz \
+                              -p 56 --missingDataAsZero --downstream 70 --upstream 200 --skipZeros -bs 1
+
+computeMatrix reference-point -S ghg38.phastCons100way.bw \
+                              -R gTSS_regions/MCF7_SP_TSS4.bed \
+                              -o gMCF7_TSS4.mat.gz \
+                              -p 56 --missingDataAsZero --downstream 200 --upstream 70 --skipZeros -bs 1
+
+
+                              
+
+plotProfile -m gMCF7_TSS.mat.gz \
+-out gprofil/MCF7_TSS.png \
+--refPointLabel  "TSS" --samplesLabel "MCF7" --yAxisLabel "Phast Cons score" \
+--regionsLabel "TSS#1 ccP" "TSS#2 ccP" "TSS#3 ccP" "TSS#4 ccP" \
+--colors "#CFE0C3" "#9EC1A3" "#70A9A1" "#40798C" --yMin 0.1 --yMax 0.45
+
+plotProfile -m gMCF7_nonTSS.mat.gz \
+-out gprofil/MCF7_nonTSS.png \
+--refPointLabel  "TSS" --samplesLabel "MCF7" --yAxisLabel "" \
+--regionsLabel "Intergenic TSS non ccP" "Gencode TSS non ccP" "Intronic TSS non ccP" \
+--colors "#CCCCCC" "#BBBBBB" "#AAAAAA" --yMin 0.1 --yMax 0.45
+
+plotProfile -m gMCF7_TSS1.mat.gz \
+-out gprofil/MCF7_TSS1.png \
+--refPointLabel  "TSS" --samplesLabel "TSS#1/Intergenic TSS" --yAxisLabel "Phast Cons score" \
+--regionsLabel "ccP" "no ccP" --colors "#EE4266" "#b8b8b7" --yMin 0.1 --yMax 0.45 
+
+plotProfile -m gMCF7_TSS4.mat.gz \
+-out gprofil/MCF7_TSS4.png \
+--refPointLabel  "TSS" --samplesLabel "TSS#4" --yAxisLabel "" \
+--regionsLabel "ccP" --colors "#EE4266" --yMin 0.1 --yMax 0.45
+
+plotProfile -m gMCF7_TSS2.mat.gz \
+-out gprofil/MCF7_TSS2.png \
+--refPointLabel  "TSS" --samplesLabel "TSS#2/Gencode TSS" --yAxisLabel "" \
+--regionsLabel "ccP" "no ccP" --colors "#EE4266" "#b8b8b7" --yMin 0.1 --yMax 0.45
+
+plotProfile -m gMCF7_TSS3.mat.gz \
+-out gprofil/MCF7_TSS3.png \
+--refPointLabel  "TSS" --samplesLabel "TSS#3/intronic TSS" --yAxisLabel "" \
+--regionsLabel "ccP" "no ccP" --colors "#EE4266" "#b8b8b7" --yMin 0.1 --yMax 0.45
+
+
+######## U2OS ##########
+
+###### PeakPairs U2OS:
+
+computeMatrix scale-regions -S ghg38.phastCons100way.bw \
+                              -R gfirstPeakPairs.bed \
+                              -o gU2OS_firstPeakPairs.mat.gz \
+                              -p 56 --missingDataAsZero --downstream 200 --upstream 500 --skipZeros -bs 1
+                              
+                              
+computeMatrix scale-regions -S ghg38.phastCons100way.bw \
+                              -R gsecondPeakPairs.bed\
+                              -o gU2OS_secondPeakPairs.mat.gz \
+                              -p 56 --missingDataAsZero --downstream 500 --upstream 200 --skipZeros -bs 1 
+
+plotProfile -m gU2OS_firstPeakPairs.mat.gz \
+-out gprofil/U2OS_firstPeakPairs.pdf \
+--samplesLabel "Upstream promoter (U2OS)" --regionsLabel "" --yAxisLabel "Phast Cons score" \
+--colors "#EE4266" --startLabel "TSS#1" --endLabel "TSS#2" --yMin 0.1 --yMax 0.45 --plotFileFormat "pdf"
+
+plotProfile -m gU2OS_secondPeakPairs.mat.gz \
+-out gprofil/U2OS_secondPeakPairs.pdf \
+--samplesLabel "Downstream promoter (U2OS)" --regionsLabel "" --yAxisLabel "" \
+--colors "#EE4266" --startLabel "TSS#3" --endLabel "TSS#4" --yMin 0.1 --yMax 0.45 --plotFileFormat "pdf"
+
+######## RPE1 ##########
+
+###### PeakPairs RPE1:
+
+computeMatrix scale-regions -S ghg38.phastCons100way.bw \
+                              -R gfirstPeakPairs.bed \
+                              -o gRPE1_firstPeakPairs.mat.gz \
+                              -p 56 --missingDataAsZero --downstream 200 --upstream 500 --skipZeros -bs 1
+                              
+                              
+computeMatrix scale-regions -S ghg38.phastCons100way.bw \
+                              -R gsecondPeakPairs.bed\
+                              -o gRPE1_secondPeakPairs.mat.gz \
+                              -p 56 --missingDataAsZero --downstream 500 --upstream 200 --skipZeros -bs 1 
+
+plotProfile -m gRPE1_firstPeakPairs.mat.gz \
+-out gprofil/RPE1_firstPeakPairs.pdf \
+--samplesLabel "Upstream promoter (RPE-1)" --regionsLabel "" --yAxisLabel "Phast Cons score" \
+--colors "#EE4266" --startLabel "TSS#1" --endLabel "TSS#2" --yMin 0.1 --yMax 0.45 --plotFileFormat "pdf"
+
+plotProfile -m gRPE1_secondPeakPairs.mat.gz \
+-out gprofil/RPE1_secondPeakPairs.pdf \
+--samplesLabel "Downstream promoter (RPE-1)" --regionsLabel "" --yAxisLabel "" \
+--colors "#EE4266" --startLabel "TSS#3" --endLabel "TSS#4" --yMin 0.1 --yMax 0.45 --plotFileFormat "pdf"
+
+
+
+  https://deeptools.readthedocs.io/en/develop/content/tools/plotProfile.html?highlight=plotprofile
+
+
+```
+
+
+# Supplemental Figure 2e
+
+```{r, fig.width=10}
+
+sfigure_2e <- read_excel("Source_Data_Extended_Data_Figure_2.xlsx", sheet = 'ExtDataFig2e') 
+
+sfigure_2e$overlap <- factor(sfigure_2e$overlap, levels = c('one', 'two', 'three'))
+sfigure_2e$dataset <- factor(sfigure_2e$dataset, levels = c('MCF7', 'U2OS', 'RPE-1'))
+
+ggplot(data = sfigure_2e, aes(x = dataset, y = pct, fill = overlap)) +
+    geom_col(position = position_stack(reverse = TRUE)) +
+    geom_text(
+        aes(label = number, y = pct, group = overlap),
+        position = position_stack(vjust = 0.5, reverse = TRUE),
+        color = "white",
+        size = 8
+    ) +
+    scale_fill_manual(
+        values = c("#90E0EF", "#00B4D8", "#0077B6"),
+        labels = c("one", "two", "three")
+    ) +
+    labs(fill = "cell lines") +
+    xlab("") + ylab("Proportion") +
+    scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
+    guides(fill = guide_legend(byrow = TRUE, title.position = "bottom")) +
+    theme_classic() + theme(
+        legend.position = "right",
+        legend.box.spacing = unit(-8, "pt"),
+        axis.title.y = element_text(size = 16, vjust = -1.5),
+        axis.text.x = element_text(size = 16, face = "bold"),
+        axis.text.y = element_text(size = 16),
+        legend.text = element_text(size = 16),
+        legend.title = element_text(size = 16),
+        axis.ticks.x = element_blank()
+    )
+```
+
+# Figure 2f
+
+```{r}
+
+sfigure_2f <- read_excel("Source_Data_Extended_Data_Figure_2.xlsx", sheet = 'ExtDataFig2f') 
+
+
+dmso_zoomed <- ggscatter(
+    sfigure_2f,
+    x = "second_peak_tpm_dmso",
+    y = "third_peak_tpm_dmso",
+    cor.coef = FALSE,
+    conf.int = FALSE,
+    cor.method = "spearman",
+    color = "#b8b8b7",
+    alpha = 0.7,
+    size = 1.5,
+) + scale_x_continuous(trans = 'log10') +
+    scale_y_continuous(trans = "log10") +
+    geom_smooth(method = lm, colour = "#899DA4") +
+   
+    stat_cor( method ="spearman", color = "#899da4", label.x = 0, label.y = 1, size = 6) + 
+    labs(x = expression(paste("TSS#2(TPM"[mean],")")),
+         y = expression(paste("TSS#3(TPM"[mean], ")"))) +
+    
+    theme_classic() + theme(
+        axis.title.x = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18)
+    ) 
+
+
+dmso <- ggscatter(
+    sfigure_2f,
+    x = "second_peak_tpm_dmso",
+    y = "third_peak_tpm_dmso",
+    cor.coef = FALSE,
+    conf.int = FALSE,
+    cor.method = "spearman",
+    color = "#b8b8b7",
+    alpha = 0.7,
+    size = 1.5) +
+    stat_cor( method ="spearman", color = "#899da4", label.x = 2000, label.y = 30, size = 6) + 
+    labs(x = expression(paste("TSS#2(TPM"[mean],")")),
+         y = expression(paste("TSS#3(TPM"[mean], ")")),
+         title = 'DMSO') +
+   
+    theme_classic() + theme(
+        plot.title = element_text(hjust = 0.5),
+        axis.title.x = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18)
+    )
+
+
+
+nutlin_zoomed <-  ggscatter(
+    sfigure_2f,
+    x = "second_peak_tpm_nutlin",
+    y = "third_peak_tpm_nutlin",
+    cor.coef = FALSE,
+    conf.int = FALSE,
+    cor.method = "spearman",
+    color = "#b8b8b7",
+    alpha = 0.7,
+    size = 1.5,
+) + scale_x_continuous(trans = 'log10') +
+    scale_y_continuous(trans = "log10") +
+    geom_smooth(method = lm, colour = "#899DA4") +
+    stat_cor( method ="spearman", color = "#899da4", label.x = 0, label.y = 1, size = 6) + 
+    labs(x = expression(paste("TSS#2(TPM"[mean],")")),
+         y = expression(paste("TSS#3(TPM"[mean], ")"))) +
+    theme_classic() + theme(
+        axis.title.x = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18)
+    ) 
+
+
+
+nutlin <- ggscatter(
+    sfigure_2f,
+    x = "second_peak_tpm_nutlin",
+    y = "third_peak_tpm_nutlin",
+    cor.coef = FALSE,
+    conf.int = FALSE,
+    cor.method = "spearman",
+    color = "#b8b8b7",
+    alpha = 0.7,
+    size = 1.5) +
+    stat_cor( method ="spearman", color = "#899da4", label.x = 2500, label.y = 100, size = 6) + 
+    labs(x = expression(paste("TSS#2(TPM"[mean],")")),
+         y = expression(paste("TSS#3(TPM"[mean], ")")),
+         title = 'Nutlin-3a') +
+    theme_classic() + theme(
+        plot.title = element_text(hjust = 0.5),
+        axis.title.x = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18)
+    ) 
+
+ggarrange(dmso, nutlin, dmso_zoomed, nutlin_zoomed, nrow = 2, ncol = 2)
+```
+

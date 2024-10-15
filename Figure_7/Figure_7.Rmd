@@ -1,0 +1,208 @@
+---
+title: "Figure_7"
+date: "2024-10-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      fig.width = 15,
+                      fig.height = 7)
+source('../libraries.R')
+
+
+```
+
+# Figure 7a
+
+```{r}
+
+figure_7_a <- read_excel("Source_Data_Figure_7.xlsx", sheet = 'Figure7a')
+
+figure_7_a$celltype <- factor(figure_7_a$celltype, levels = c("MCF7", "U2OS", "RPE1"))
+figure_7_a$included_biotype <- factor(figure_7_a$included_biotype, levels = rev(c(
+    "protein_coding", "lncRNA", "others", "N/A"
+)))
+
+ggplot(figure_7_a, aes(x = TSS, y = count, fill = included_biotype)) +
+    geom_bar(stat = "identity") +
+    facet_wrap( ~ celltype, labeller = as_labeller(c(
+        MCF7 = "MCF-7", U2OS = "U2OS", RPE1 = "RPE-1"
+    ))) +
+    xlab("") + ylab("count") + labs(fill = "Biotypes")  +
+    scale_x_discrete(labels = c("first" = "hostTSS", "second" = "daTSS")) +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_fill_manual(values = c("#b8b8b7", "#ee9b00", "#ca6702", "#BB3E03")) +
+    theme_classic() + theme(
+        legend.position = "bottom",
+        legend.box.spacing = unit(-8, "pt"),
+        axis.title.y = element_text(size = 18),
+        axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18),
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 16),
+        strip.text = element_text(size = 16, face = "bold"),
+        strip.background = element_blank(),
+        axis.ticks.x = element_blank()
+    )
+```
+
+# Figure 7c 
+
+
+
+```{r}
+figure_7_c <- read_excel("Source_Data_Figure_7.xlsx", sheet = 'Figure7c' )
+
+figure_7_c$set <- as.factor(figure_7_c$set)
+
+sets <- figure_7_c %>% group_by(set) %>%
+	dplyr::count(set) %>% 
+	mutate(label = paste0("n = ", n))
+
+median <- figure_7_c %>%
+	group_by(set) %>%
+	summarize(median = round(median(width)))
+
+ ggplot(figure_7_c, aes(x = set, y = width, color = set, fill = set)) + 
+	geom_violin(alpha = 0.4, adjust = 4)+
+	# geom_point(position = position_jitter(width = 0.15), size = 1, alpha = 0.4) + 
+	ylab("daRNA length (bp)") + xlab("")+
+	geom_boxplot(aes(x = as.numeric(set), y = width), outlier.shape = NA, alpha = 0.3, width= 0.1)+
+	scale_fill_manual(values=c( "#40b7adff", "#366a9fff"))+
+	scale_colour_manual(values=c("#40b7adff", "#366a9fff"))+
+	scale_x_discrete(labels=c("a_all" = "all", "b_strongest" = "dominant")) +
+	scale_y_log10(labels = scales::comma) +
+	geom_text(data = median, aes(label = paste0(median, "\nbp"), y = median +1, x = as.numeric(set)+0.17),
+						size = 4) +
+	# facet wrap(~set, scales = "free", labeller=as_labeller(c("a_all" = "all", "b_strongest" = "strongest", "c_longest"="longest"))) +
+	theme_classic() + theme(
+		axis.title.x = element_text(size = 18),
+		axis.title.y = element_text(size = 18, vjust = -1),
+		axis.text.x = element_text(size = 18),
+		axis.text.y = element_text(size = 18),
+		legend.position='none',
+		strip.text = element_text(size = 16),
+		strip.background = element_blank(),
+		axis.ticks.x = element_blank())+
+	geom_text(data = sets, aes(y = 80, label = label), size = 4)
+
+```
+
+# Figure 7d
+
+```{r}
+
+figure_7_d <- read_excel("Source_Data_Figure_7.xlsx", sheet = 'Figure7d')
+
+figure_7_d$biotype <- factor(figure_7_d$biotype, levels = rev(figure_7_d[order(figure_7_d$Freq),'biotype']$biotype))
+
+ggplot(figure_7_d, aes(x = biotype, y=Freq, fill=biotype))+
+	geom_bar(stat = "identity") + 
+	xlab("")+ ylab("count")+ labs(fill = "Biotypes") +
+	theme_classic() + theme(legend.position="right",
+													legend.box.spacing = unit(-8, "pt"),
+													axis.title.y = element_text(size = 18),
+													axis.text.x = element_text(size = 18),
+													axis.text.y = element_text(size = 18),
+													legend.title=element_text(size=16),
+													legend.text=element_text(size=16),
+													strip.text = element_text(size = 16, face = "bold"),
+													strip.background = element_blank(),
+													axis.ticks.x = element_blank()) +
+	scale_x_discrete(labels=c("a_daRNA" = "daRNA","b_adjacent" = "read-in", "c_overlaps" = "included")) +
+	scale_y_continuous(expand = c(0,5)) + 
+	scale_fill_manual(values= c("#b8b8b7",
+	                            "#BB3E03",
+	                            "#ca6702",
+	                            "#ee9b00"),
+	                            guide = guide_legend(reverse = TRUE))
+
+```
+
+# Figure 7e
+
+```{r}
+figure_7_e <- read_excel("Source_Data_Figure_7.xlsx", sheet = 'Figure7e')
+
+ggscatter(
+		figure_7_e,
+		x = "hostgene_RNA_lfc",
+		y = "da_RNA_lfc",
+		cor.coef = FALSE,
+		conf.int = FALSE,
+		cor.method = "spearman",
+		color = "#b8b8b7",
+		alpha = 0.7,
+		size = 1.5,
+	) +
+	geom_smooth(method = lm, colour = "#899DA4") +
+	stat_quadrant_counts(color = "#899DA4", size = 6) +
+	geom_hline(yintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	stat_cor(method ="spearman", color = "#899DA4", label.x = -1.6, label.y = -5.08, size = 6) +
+	geom_vline(xintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	labs(x = expression(paste("host gene(Log"[2], "FC)")),
+			 y = expression(paste("daRNA(Log"[2], "FC)"))) +
+	scale_x_continuous(breaks = seq(-6, 12, by =2)) +
+	scale_y_continuous(breaks = seq(-6, 12, by =2)) +
+	theme_classic() + theme(
+		axis.title.x = element_text(size = 16),
+		axis.title.y = element_text(size = 16),
+		axis.text.x = element_text(size = 18),
+		axis.text.y = element_text(size = 18)
+	) + geom_density_2d(size = 1, colour = "#899DA4")
+```
+
+# Figure 7f
+
+```{r}
+
+figure_7_f <- read_excel("Source_Data_Figure_7.xlsx", sheet = 'Figure7f')
+
+figure_7_f <- figure_7_f %>% 
+    mutate(comparison = case_when(grepl("^DMSO", comparison) ~ "E2 24h", .default = "E2 3h"))
+
+figure_7_f$comparison <- factor(figure_7_f$comparison, levels = c("E2 3h", "E2 24h"))
+
+ggscatter(
+	figure_7_f,
+		x = "gene_RNA_lfc",
+		y = "da_RNA_lfc",
+		cor.coef = FALSE,
+		conf.int = FALSE,
+		cor.method = "spearman",
+		color = "#b8b8b7",
+		alpha = 0.7,
+		size = 1.5,
+	) +
+	geom_smooth(method = lm, colour = "#899DA4") +
+	stat_quadrant_counts(color = "#899DA4", size = 6) +
+	geom_hline(yintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	stat_cor(method ="spearman", color = "#899DA4", label.x = -2, label.y = -4, size = 6) +
+	geom_vline(xintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	facet_wrap(~comparison, scales = "free") +
+	labs(x = expression(paste("host gene(Log"[2], "FC)")),
+			 y = expression(paste("daRNA(Log"[2], "FC)"))) +
+	scale_x_continuous(limits=c(-4.1,4.1), breaks = seq(-6, 12, by =2)) +
+	scale_y_continuous(limits=c(-5.1,4), breaks = seq(-6, 12, by =2)) +
+	theme_classic() + theme(
+		axis.title.x = element_text(size = 16),
+		axis.title.y = element_text(size = 16),
+		axis.text.x = element_text(size = 18),
+		axis.text.y = element_text(size = 18),
+		strip.text = element_text(size = 16),
+		strip.background = element_blank()) + 
+	geom_density_2d(linewidth = 1, colour = "#899DA4", n = 50, bins = 8)+
+	scale_alpha_identity() +
+	geom_density_2d(aes(alpha= as.numeric(as.factor(comparison)) %/% 4),linewidth = 1, colour = "#899DA4", n = 50, bins = 80)
+```
+

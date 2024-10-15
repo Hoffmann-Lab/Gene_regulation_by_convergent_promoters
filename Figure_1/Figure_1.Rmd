@@ -1,0 +1,393 @@
+---
+title: "Figure_1"
+date: "2024-10-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      fig.width = 15,
+                      fig.height = 10)
+
+
+source('../libraries.R')
+```
+
+
+```{r}
+
+label_x = 2
+label_y = -3.5
+```
+
+# Figure 1e
+
+```{r}
+
+figure_1_e <- read_excel("Source_Data_Figure_1.xlsx", sheet = 'Figure1e' )
+
+x <- c(min(figure_1_e$first_peak_l2fc, na.rm = TRUE), max(figure_1_e$first_peak_l2fc, na.rm = TRUE))
+	
+y <- c(min(figure_1_e$second_peak_l2fc, na.rm = TRUE), max(figure_1_e$second_peak_l2fc, na.rm = TRUE)) 
+
+ggscatter(
+			figure_1_e,
+			x = "first_peak_l2fc",
+			y = "second_peak_l2fc",
+			cor.coef = FALSE,
+			conf.int = FALSE,
+			cor.method = "spearman",
+			color = "#b8b8b7",
+			alpha = 0.7,
+			size = 1.5,
+		) +
+		geom_smooth(method = lm, colour = "#899DA4") +
+		stat_quadrant_counts(color = "#899DA4", size = 6) +
+		geom_hline(yintercept = 0,
+							 colour = "#899DA4",
+							 alpha = 0.7) +
+		geom_vline(xintercept = 0,
+							 colour = "#899DA4",
+							 alpha = 0.7) +
+		stat_cor( method = "spearman", color = "#899DA4", label.x = label_x, label.y = label_y, size = 6) + 
+		labs(x = expression(paste("TSS#1(Log"[2], "FC)")),
+				 y = expression(paste("TSS#2(Log"[2], "FC)"))) +
+		scale_x_continuous(limits = c(min(x), max(x)), breaks = seq(-4, 8, by =2)) +
+		scale_y_continuous(limits = c(min(y), max(y)), breaks = seq(-4, 8, by =2)) +
+		theme_classic() + theme(
+			axis.title.x = element_text(size = 16),
+			axis.title.y = element_text(size = 16),
+			axis.text.x = element_text(size = 18),
+			axis.text.y = element_text(size = 18)
+		) + geom_density_2d(size = 1, colour = "#899DA4")
+
+
+
+```
+
+# Figure 1f
+
+
+```{r}
+
+
+figure_1_f <- read_excel("Source_Data_Figure_1.xlsx", sheet = 'Figure1f' )
+
+x <- c(
+    min(figure_1_f$second_peak_l2fc, na.rm = TRUE),
+    max(figure_1_f$second_peak_l2fc, na.rm = TRUE)
+)
+y <- c(
+    min(figure_1_f$third_peak_l2fc, na.rm = TRUE),
+    max(figure_1_f$third_peak_l2fc, na.rm = TRUE)
+)
+
+ggscatter(
+    figure_1_f,
+    x = "second_peak_l2fc",
+    y = "third_peak_l2fc",
+    cor.coef = FALSE,
+    conf.int = FALSE,
+    cor.method = "spearman",
+    color = "#b8b8b7",
+    alpha = 0.7,
+    size = 1.5,
+) +
+    geom_smooth(method = lm, colour = "#899DA4") +
+    stat_quadrant_counts(color = "#899DA4", size = 6) +
+    geom_hline(yintercept = 0,
+               colour = "#899DA4",
+               alpha = 0.7) +
+    geom_vline(xintercept = 0,
+               colour = "#899DA4",
+               alpha = 0.7) +
+    stat_cor(
+        method = "spearman",
+        color = "#899da4",
+        label.x = label_x,
+        label.y = label_y,
+        size = 6
+    ) +
+    labs(x = expression(paste("TSS#2(Log"[2], "FC)")), y = expression(paste("TSS#3(Log"[2], "FC)"))) +
+    scale_x_continuous(limits = c(min(x), max(x)), breaks = seq(-4, 8, by =
+                                                                    2)) +
+    scale_y_continuous(limits = c(min(y), max(y)), breaks = seq(-4, 8, by =
+                                                                    2)) +
+    theme_classic() + theme(
+        axis.title.x = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18)
+    ) + geom_density_2d(size = 1 , colour = "#899DA4")
+
+
+```
+
+# Figure 1g
+
+```{r}
+
+figure_1_g <- read_excel("Source_Data_Figure_1.xlsx", sheet = 'Figure1g' )
+
+x <- c(min(figure_1_g$third_peak_l2fc, na.rm = TRUE), max(figure_1_g$third_peak_l2fc, na.rm = TRUE))
+y <- c(min(figure_1_g$fourth_peak_l2fc, na.rm = TRUE), max(figure_1_g$fourth_peak_l2fc, na.rm = TRUE)) 
+
+ggscatter(
+    figure_1_g,
+    x = "third_peak_l2fc",
+    y = "fourth_peak_l2fc",
+    cor.coef = FALSE,
+    conf.int = FALSE,
+    cor.method = "spearman",
+    color = "#b8b8b7",
+    alpha = 0.7,
+    size = 1.5,
+) +
+    geom_smooth(method = lm, colour = "#899DA4") +
+    stat_quadrant_counts(color = "#899DA4", size = 6) +
+    geom_hline(yintercept = 0,
+               colour = "#899DA4",
+               alpha = 0.7) +
+    geom_vline(xintercept = 0,
+               colour = "#899DA4",
+               alpha = 0.7) +
+    stat_cor(
+        method = "spearman",
+        color = "#899da4",
+        label.x = label_x,
+        label.y = label_y,
+        size = 6
+    ) +
+    labs(x = expression(paste("TSS#3(Log"[2], "FC)")), y = expression(paste("TSS#4(Log"[2], "FC)"))) +
+    scale_x_continuous(limits = c(min(x), max(x)), breaks = seq(-4, 8, by =
+                                                                    2)) +
+    scale_y_continuous(limits = c(min(y), max(y)), breaks = seq(-4, 8, by =
+                                                                    2)) +
+    theme_classic() + theme(
+        axis.title.x = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18)
+    ) + geom_density_2d(size = 1, colour = "#899DA4")
+```
+
+
+Figure 1h
+
+```{r}
+
+figure_1_h <- read_excel("Source_Data_Figure_1.xlsx", sheet = 'Figure1h')
+
+
+basemean_split_plot <- function(PromoterPairs, celltype){
+	x <- c(min(PromoterPairs$first_peak_l2fc, na.rm = TRUE), max(PromoterPairs$first_peak_l2fc, na.rm = TRUE), 
+				 min(PromoterPairs$second_peak_l2fc, na.rm = TRUE), max(PromoterPairs$second_peak_l2fc, na.rm = TRUE), 
+				 min(PromoterPairs$third_peak_l2fc, na.rm = TRUE), max(PromoterPairs$third_peak_l2fc, na.rm = TRUE))
+	
+	y <- c(min(PromoterPairs$second_peak_l2fc, na.rm = TRUE), max(PromoterPairs$second_peak_l2fc, na.rm = TRUE), 
+				 min(PromoterPairs$third_peak_l2fc, na.rm = TRUE), max(PromoterPairs$third_peak_l2fc, na.rm = TRUE),
+				 min(PromoterPairs$fourth_peak_l2fc, na.rm = TRUE), max(PromoterPairs$fourth_peak_l2fc, na.rm = TRUE))
+	# Split TSS2 & TSS3 into 3 plots with corresponding base mean expression of host gene
+	PromoterPairs <- mutate(PromoterPairs, log_max = log10(baseMean))
+	q <- quantile(PromoterPairs$log_max, na.rm = TRUE, probs = c(0, 0.33, 0.66, 1))
+	
+	PromoterPairs <- mutate(PromoterPairs, plot = ifelse(log_max < q[[2]], "a_low",
+																											 ifelse(log_max >= q[[2]] & log_max < q[[3]], "b_med","c_high")))
+	PromoterPairs_filtered <- filter(PromoterPairs, !is.na(baseMean))
+
+	labels_plot <- c(a_low="low expression", 
+									 b_med="medium expression",
+									 c_high="high expression")
+	
+	label_x <- case_match(celltype,
+												"MCF7" ~ -2,
+												"U2OS" ~ -3.4,
+												"RPE1" ~ -3.6)
+	label_y <- case_match(celltype,
+												"MCF7" ~ -4.5,
+												"U2OS" ~ -5.75,
+												"RPE1" ~ -5.45)
+	
+	baseMean_split <- ggscatter(
+	    PromoterPairs_filtered,
+	    x = "second_peak_l2fc",
+	    y = "third_peak_l2fc",
+	    cor.coef = FALSE,
+	    conf.int = FALSE,
+	    cor.method = "spearman",
+	    color = "log_max",
+	    alpha = 0.7,
+	    size = 1.5
+	) +
+	    geom_smooth(method = lm,
+	                colour = "#b8b8b7",
+	                size = 0.8) +
+	    stat_quadrant_counts(color = "#b8b8b7", size = 6) +
+	    geom_hline(yintercept = 0,
+	               colour = "#b8b8b7",
+	               alpha = 0.7) +
+	    geom_vline(xintercept = 0,
+	               colour = "#b8b8b7",
+	               alpha = 0.7) +
+	    stat_cor(
+	        method = "spearman",
+	        color = "#b8b8b7",
+	        label.x = label_x,
+	        label.y = label_y,
+	        size = 6
+	    ) +
+	    labs(
+	        x = expression(paste("TSS#2(Log"[2], "FC)")),
+	        y = expression(paste("TSS#3(Log"[2], "FC)")),
+	        color = "Basemean of\nhostgene expression"
+	    ) +
+	    scale_x_continuous(limits = c(min(x), max(x)), breaks = seq(-4, 8, by =
+	                                                                    2)) +
+	    scale_y_continuous(limits = c(min(y), max(y)), breaks = seq(-4, 8, by =
+	                                                                    2)) +
+	    theme_classic() + theme(
+	        legend.position = "right",
+	        axis.title.x = element_text(size = 16),
+	        axis.title.y = element_text(size = 16),
+	        axis.text.x = element_text(size = 16),
+	        axis.text.y = element_text(size = 16),
+	        strip.text = element_text(size = 16),
+	        strip.background = element_blank()
+	    ) +
+	    guides(color = guide_colourbar(
+	        reverse = TRUE,
+	        title.position = "bottom",
+	        label.position = "left"
+	    )) +
+	    geom_density_2d(size = 0.8 ,
+	                    colour = "#b8b8b7",
+	                    alpha = 0.8) +
+	    facet_wrap( ~ plot, labeller = as_labeller(labels_plot), scales = "free") +
+	    scale_color_gradientn(
+	        colors = heat.colors(n = 100, rev = TRUE),
+	        breaks = c(0, 1, 2, 3, 4, 5),
+	        labels = c("0", "10", "100", "1000", "10000", "100000")
+	    )
+	
+	baseMean_split <- rasterize(baseMean_split, dpi = 300)
+	return(baseMean_split)
+}
+
+basemean_split_plot(figure_1_h, "MCF7")
+
+```
+
+# Figure 1i
+
+```{r}
+
+figure_1_i <- read_excel("Source_Data_Figure_1.xlsx", sheet = 'Figure1i')
+
+distance_split_plot <- function(PromoterPairs, celltype) {
+    x <- c(
+        min(PromoterPairs$first_peak_l2fc, na.rm = TRUE),
+        max(PromoterPairs$first_peak_l2fc, na.rm = TRUE),
+        min(PromoterPairs$second_peak_l2fc, na.rm = TRUE),
+        max(PromoterPairs$second_peak_l2fc, na.rm = TRUE),
+        min(PromoterPairs$third_peak_l2fc, na.rm = TRUE),
+        max(PromoterPairs$third_peak_l2fc, na.rm = TRUE)
+    )
+    
+    y <- c(
+        min(PromoterPairs$second_peak_l2fc, na.rm = TRUE),
+        max(PromoterPairs$second_peak_l2fc, na.rm = TRUE),
+        min(PromoterPairs$third_peak_l2fc, na.rm = TRUE),
+        max(PromoterPairs$third_peak_l2fc, na.rm = TRUE),
+        min(PromoterPairs$fourth_peak_l2fc, na.rm = TRUE),
+        max(PromoterPairs$fourth_peak_l2fc, na.rm = TRUE)
+    )
+    
+    q <- quantile(PromoterPairs$distance,
+                  na.rm = TRUE,
+                  probs = c(0, 0.33, 0.66, 1))
+    
+    PromoterPairs <- mutate(PromoterPairs, plot = ifelse(
+        distance < q[[2]],
+        "a_low",
+        ifelse(distance >= q[[2]] &
+                   distance < q[[3]], "b_med", "c_high")
+    ))
+    
+    PromoterPairs_filtered <- filter(PromoterPairs, !is.na(distance))
+    
+    labels_plot <- c(a_low = "small distance",
+                     b_med = "medium distance",
+                     c_high = "long distance")
+    
+    label_x <- case_match(celltype, "MCF7" ~ -2, "U2OS" ~ -3.4, "RPE1" ~ -3.6)
+    label_y <- case_match(celltype, "MCF7" ~ -4.5, "U2OS" ~ -5.75, "RPE1" ~ -5.45)
+    
+    distance_split <- ggscatter(
+        PromoterPairs_filtered,
+        x = "second_peak_l2fc",
+        y = "third_peak_l2fc",
+        cor.coef = FALSE,
+        conf.int = FALSE,
+        cor.method = "spearman",
+        color = "distance",
+        alpha = 0.7,
+        size = 1.5
+    ) +
+        geom_smooth(method = lm,
+                    colour = "#b8b8b7",
+                    size = 0.8) +
+        stat_quadrant_counts(color = "#b8b8b7", size = 6) +
+        geom_hline(yintercept = 0,
+                   colour = "#b8b8b7",
+                   alpha = 0.7) +
+        geom_vline(xintercept = 0,
+                   colour = "#b8b8b7",
+                   alpha = 0.7) +
+        stat_cor(
+            method = "spearman",
+            color = "#b8b8b7",
+            label.x = label_x,
+            label.y = label_y,
+            size = 6
+        ) +
+        labs(x = expression(paste("TSS#2(Log"[2], "FC)")),
+             y = expression(paste("TSS#3(Log"[2], "FC)")),
+             color = "Distance between\nTSS#2 and TSS#3") +
+        scale_x_continuous(limits = c(min(x), max(x)),
+                           breaks = seq(-4, 8, by =
+                                            2)) +
+        scale_y_continuous(limits = c(min(y), max(y)),
+                           breaks = seq(-4, 8, by =
+                                            2)) +
+        theme_classic() + theme(
+            legend.position = "right",
+            axis.title.x = element_text(size = 16),
+            axis.title.y = element_text(size = 16),
+            axis.text.x = element_text(size = 16),
+            axis.text.y = element_text(size = 16),
+            strip.text = element_text(size = 16),
+            strip.background = element_blank()
+        ) +
+        guides(color = guide_colourbar(
+            reverse = TRUE,
+            title.position = "bottom",
+            label.position = "left"
+        )) +
+        geom_density_2d(size = 0.8 ,
+                        colour = "#b8b8b7",
+                        alpha = 0.8) +
+        facet_wrap(~ plot,
+                   labeller = as_labeller(labels_plot),
+                   scales = "free") +
+        scale_color_viridis(option = "mako", direction = -1)
+    
+    distance_split <- rasterize(distance_split, dpi = 300)
+    
+    return(distance_split)
+}
+
+distance_split_plot(figure_1_i, "MCF7")
+
+```
+

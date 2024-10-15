@@ -1,0 +1,240 @@
+---
+title: "Supplemental_Figure_8"
+date: "2024-10-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      fig.width = 15,
+                      fig.height = 10)
+source('../libraries.R')
+
+```
+
+# Supplemental Figure 8b
+
+```{r}
+
+sfigure_8_b <- read_excel("Source_Data_Extended_Data_Figure_8.xlsx", sheet = 'ExtDataFig8b' )
+
+
+sfigure_8_b$overlap <- factor(sfigure_8_b$overlap, levels = c('one', 'two', 'three'))
+sfigure_8_b$dataset <- factor(sfigure_8_b$dataset, levels = c('MCF7', 'U2OS', 'RPE-1'))
+
+ggplot(data = sfigure_8_b, aes(x = dataset, y = pct, fill = overlap)) +
+    geom_col(position = position_stack(reverse = TRUE)) +
+    geom_text(
+        aes(label = number, y = pct, group = overlap),
+        position = position_stack(vjust = 0.5, reverse = TRUE),
+        color = "white",
+        size = 8
+    ) +
+    scale_fill_manual(
+        values = c("#90E0EF", "#00B4D8", "#0077B6"),
+        labels = c("one", "two", "three")
+    ) +
+    labs(fill = "cell lines") +
+    xlab("") + ylab("Proportion") +
+    scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
+    guides(fill = guide_legend(byrow = TRUE, title.position = "bottom")) +
+    theme_classic() + theme(
+        legend.position = "right",
+        legend.box.spacing = unit(-8, "pt"),
+        axis.title.y = element_text(size = 16, vjust = -1.5),
+        axis.text.x = element_text(size = 16, face = "bold"),
+        axis.text.y = element_text(size = 16),
+        legend.text = element_text(size = 16),
+        legend.title = element_text(size = 16),
+        axis.ticks.x = element_blank()
+    )
+
+```
+# Supplemental Figure 8c
+
+## U2OS
+
+```{r}
+sfigure_8_c_u2os <- read_excel("Source_Data_Extended_Data_Figure_8.xlsx", sheet = 'ExtDataFig8c_u2os' )
+
+prepare_df_plot <- function(df_plot, filter_step){
+	# level_SP <- c("noccP|noCpG", "ccP|noCpG", "noccP|CpG", "ccP|CpG")
+	# level_sign <- c("noccP|noCpG", "ccP|noCpG", "noccP|CpG", "ccP|CpG")
+	# df_plot$SP <- as.factor(df_plot$SP)
+	
+	# df_plot <- mutate(df_plot, plot_celltype = ifelse(celltype == "MCF7", "a", 
+	# 																									ifelse(celltype == "U2OS", "b", "c")))
+	
+	cells <- df_plot %>% group_by(celltype) %>%
+		count(SP) %>% 
+		mutate(label = paste0("n = ", n))
+	
+	median <- df_plot %>%
+		group_by(celltype,SP)%>%
+		summarize(median = round(median(reads)))
+	
+	# my_comparisons <- list(c("b_ccP|noCpG", "a_noccP|noCpG"), c("d_ccP|CpG", "c_noccP|CpG"))
+	# df_plot$SP_ordered <- factor(df_plot$SP, level = level_SP)
+
+	stat_test <- compare_means(reads ~ SP,  data = df_plot, method = "t.test", group.by = "celltype")
+	
+	
+	stat_test_filtered <- filter(stat_test, group1=="b_ccP|noCpG" & group2=="a_noccP|noCpG" | 
+															 	group1=="d_ccP|CpG" & group2=="c_noccP|CpG")
+	level_celltype <- c("MCF-7" ,"U2OS", "RPE-1")
+	
+	plot <- ggplot(df_plot, aes(x = SP, y = reads, group = SP)) +
+		geom_violin(aes(color = SP, 
+										fill = SP),  adjust = 4)+
+		ylab("CAGE-seq TSS read count") + xlab("TSS part of")+
+		geom_boxplot(aes(x = as.numeric(factor(SP)), 
+										 y = reads), fill = "grey40",
+								 outlier.shape = NA, width= 0.2)+
+		scale_fill_manual(values=c("#e1e1e0", "#b8b8b7", "#f8a9ba", "#EE4266"))+
+		scale_colour_manual(values=c("#e1e1e0", "#b8b8b7", "#f8a9ba", "#EE4266"))+
+		geom_text(data = median, 
+							aes(label = median, y = median +1, 
+									x = as.numeric(factor(SP))+0.27),size = 4, color = "grey30") +
+		scale_x_discrete(labels=c("a_noccP|noCpG" = "noccP|noCpG",
+															"b_ccP|noCpG" = "ccP|noCpG",
+															"c_noccP|CpG" ="noccP|CpG",
+															"d_ccP|CpG" = "ccP|CpG")) +
+		scale_y_log10(labels = scales::comma, expand = c(0,0.2)) +
+		stat_pvalue_manual(stat_test_filtered, label = "p.signif", tip.length = 0, color = "grey30",
+											step.increase = 0, size = 4, y.position = 5.8)+
+		theme_classic() + theme(
+			axis.title.x = element_text(size = 18),
+			axis.title.y = element_text(size = 18),
+			axis.text.x = element_text(size = 18, angle = 90, vjust = 0.5, hjust=1),
+			axis.text.y = element_text(size = 18),
+			legend.position='none',
+			strip.text = element_text(size = 16, face = "bold"),
+			strip.background = element_blank(),
+			axis.ticks.x = element_blank()) +
+		geom_text(data = cells, aes(y = 0.75, label = label, size = 20), color = "grey30")+
+		facet_wrap(~factor(celltype, level = level_celltype))
+	return(plot)
+}
+
+
+prepare_df_plot(sfigure_8_c_u2os)
+```
+## RPE-1
+
+```{r}
+sfigure_8_c_rpe1 <- read_excel("Source_Data_Extended_Data_Figure_8.xlsx", sheet = 'ExtDataFig8c_rpe1' )
+
+prepare_df_plot(sfigure_8_c_rpe1)
+
+```
+
+
+# Supplemental Figure 8d
+
+```{r}
+sfigure_8_d <- read_excel("Source_Data_Extended_Data_Figure_8.xlsx", sheet = 'ExtDataFig8d' )
+
+level_celltype <- c("MCF-7", "U2OS", "RPE-1")
+
+
+
+stat_test <- compare_means(tau ~ group,  data = sfigure_8_d, method = "t.test", group.by = "celltype")
+
+stat_test_filtered <- filter(stat_test, group2=="b_ccP|noCpG" & group1=="a_noccP|noCpG" | 
+														 	group2=="d_ccP|CpG" & group1=="c_noccP|CpG")
+
+cells <- sfigure_8_d %>% group_by(celltype) %>%
+	count(group) %>% 
+	mutate(label = paste0("n = ", n))
+
+ggplot(sfigure_8_d, aes(x = group, y = tau)) +
+    geom_violin(aes(color = group, fill = group), adjust = 4) +
+    ylab("tau index") + xlab("Gene part of") +
+    geom_boxplot(
+        aes(
+            x = as.numeric(factor(group)),
+            y = tau,
+            group = group
+        ),
+        color = "grey30",
+        fill = "grey40",
+        outlier.shape = NA,
+        width = 0.2
+    ) +
+    scale_fill_manual(values = c("#e1e1e0", "#b8b8b7", "#f8a9ba", "#EE4266")) +
+    scale_colour_manual(values = c("#e1e1e0", "#b8b8b7", "#f8a9ba", "#EE4266")) +
+    scale_x_discrete(
+        labels = c(
+            "a_noccP|noCpG" = "-CP\nCGI",
+            "b_ccP|noCpG" = "+cP\n-CGI",
+            "c_noccP|CpG" = "-cP\n+CGI",
+            "d_ccP|CpG" = "+cP\n+CGI"
+        )
+    ) +
+    scale_y_continuous(breaks = c(0, 0.2, 0.5, 0.85, 1)) +
+    geom_hline(yintercept = 0.2, linetype = "dashed") +
+    geom_text(
+        data = data.frame(
+            x = 0.8,
+            y = 0.18,
+            celltype = "MCF-7",
+            label = "HKGs"
+        ),
+        aes(x = x, y = y, label = label),
+        size = 7
+    ) +
+    geom_hline(yintercept = 0.85, linetype = "dashed") +
+    geom_text(
+        data = data.frame(
+            x = 0.8,
+            y = 0.87,
+            celltype = "MCF-7",
+            label = "HSGs"
+        ),
+        aes(x = x, y = y, label = label),
+        size = 7
+    ) +
+    geom_hline(yintercept = 1, linetype = "dashed") +
+    geom_text(
+        data = data.frame(
+            x = 0.8,
+            y = 1.02,
+            celltype = "MCF-7",
+            label = "ASGs"
+        ),
+        aes(x = x, y = y, label = label),
+        size = 7
+    ) +
+    stat_pvalue_manual(
+        stat_test_filtered,
+        label = "p.signif",
+        tip.length = 0,
+        color = "grey30",
+        step.increase = 0,
+        size = 7,
+        y.position = 1.03
+    ) +
+    facet_wrap( ~ factor(celltype, level = level_celltype)) +
+    geom_text(
+        data = cells,
+        aes(y = -0.03, label = label),
+        size = 7,
+        color = "grey30"
+    ) +
+    theme_classic() + theme(
+        axis.title.x = element_text(size = 18),
+        axis.title.y = element_text(size = 18),
+        axis.text.x = element_text(
+            size = 18,
+            vjust = 0.5,
+            hjust = 1
+        ),
+        axis.text.y = element_text(size = 18),
+        legend.position = 'none',
+        strip.text = element_text(size = 16, face = "bold"),
+        strip.background = element_blank(),
+        axis.ticks.x = element_blank()
+    ) 
+```
+

@@ -1,0 +1,152 @@
+---
+title: "Supplemental_Figure_9"
+date: "2024-10-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      fig.width = 15,
+                      fig.height = 15)
+
+source('../libraries.R')
+
+
+
+```
+
+# Supplemental Figure 9a
+
+```{r}
+
+sfigure_9_a <- read_excel("Source_Data_Extended_Data_Figure_9.xlsx", sheet = 'ExtDataFig9a' )
+
+
+labels_plot <- c(a_low="low expression", 
+								 b_med="medium expression",
+								 c_high="high expression",
+								 a_MCF7="MCF-7",
+								 b_U2OS = "U2OS",
+								 c_RPE1 = "RPE-1")
+
+ggscatter(
+    sfigure_9_a,
+    x = "first_peak_l2fc",
+    y = "second_peak_l2fc",
+    cor.coef = FALSE,
+    conf.int = FALSE,
+    cor.method = "spearman",
+    color = "log_max",
+    alpha = 0.7,
+    size = 1.5
+) +
+    geom_smooth(method = lm,
+                colour = "#b8b8b7",
+                size = 0.8) +
+    stat_quadrant_counts(color = "#b8b8b7", size = 6) +
+    geom_hline(yintercept = 0,
+               colour = "#b8b8b7",
+               alpha = 0.7) +
+    geom_vline(xintercept = 0,
+               colour = "#b8b8b7",
+               alpha = 0.7) +
+    stat_cor(
+        method = "spearman",
+        color = "#b8b8b7",
+        label.x = -3.7,
+        label.y = -6.005,
+        size = 6
+    ) +
+    labs(x = expression(paste("hostTSS(Log"[2], "FC)")),
+         y = expression(paste("daTSS(Log"[2], "FC)")),
+         color = "Basemean of\nhostgene expression") +
+    scale_x_continuous(limits = c(min(sfigure_9_a$first_peak_l2fc), max(sfigure_9_a$first_peak_l2fc)), breaks = seq(-6, 8, by =
+                                                                    2)) +
+    scale_y_continuous(limits = c(min(sfigure_9_a$second_peak_l2fc), max(sfigure_9_a$second_peak_l2fc)), breaks = seq(-6, 8, by =
+                                                                    2)) +
+    theme_classic() + theme(
+        legend.position = "right",
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 14),
+        axis.title.x = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
+        strip.text = element_text(size = 16),
+        strip.text.y = element_text(face = "bold"),
+        strip.background = element_blank()
+    ) +
+    guides(color = guide_colourbar(title.position = "bottom", label.position = "left")) +
+    geom_density_2d(size = 0.8 ,
+                    colour = "#b8b8b7",
+                    alpha = 0.8) +
+    facet_rep_grid(
+        celltype ~ plot,
+        labeller = as_labeller(labels_plot),
+        scales = "free",
+        repeat.tick.labels = TRUE
+    ) +
+    scale_color_gradientn(
+        colors = heat.colors(n = 100, rev = TRUE),
+        breaks = c(0, 1, 2, 3, 4, 5),
+        labels = c("0", "10", "100", "1000", "10000", "100000")
+    )
+
+```
+
+
+# Supplemental Figure 9b
+
+```{r}
+sfigure_9_b <- read_excel("Source_Data_Extended_Data_Figure_9.xlsx", sheet = 'ExtDataFig9b' )
+
+labels_plot <- c(a_low="small distance", 
+								 b_med="medium distance",
+								 c_high="long distance",
+								 a_MCF7="MCF-7",
+								 b_U2OS = "U2OS",
+								 c_RPE1 = "RPE-1")
+
+ggscatter(
+	sfigure_9_b,
+	x = "first_peak_l2fc",
+	y = "second_peak_l2fc",
+	cor.coef = FALSE,
+	conf.int = FALSE,
+	cor.method = "spearman",
+	color = "distance",
+	alpha = 0.7,
+	size = 1.5
+) +
+	geom_smooth(method = lm, colour = "#b8b8b7", size = 0.8) +
+	stat_quadrant_counts(color = "#b8b8b7", size = 6) +
+	geom_hline(yintercept = 0,
+						 colour = "#b8b8b7",
+						 alpha = 0.7) +
+	geom_vline(xintercept = 0,
+						 colour = "#b8b8b7",
+						 alpha = 0.7) +
+	stat_cor(method ="spearman", color = "#b8b8b7", label.x = -3.7, label.y = -6.005, size = 6) +
+	labs(x = expression(paste("hostTSS(Log"[2], "FC)")),
+			 y = expression(paste("daTSS(Log"[2], "FC)")),
+			 color="Distance between\nhostTSS and daTSS ") +
+	scale_x_continuous(limits = c(min(sfigure_9_b$first_peak_l2fc), max(sfigure_9_b$first_peak_l2fc)), breaks = seq(-6, 8, by =2)) +
+	scale_y_continuous(limits = c(min(sfigure_9_b$second_peak_l2fc), max(sfigure_9_b$second_peak_l2fc)), breaks = seq(-6, 8, by =2)) +
+	theme_classic() + theme(legend.position="right",
+													legend.title = element_text(size = 16),
+													legend.text = element_text(size = 14),
+													axis.title.x = element_text(size = 16),
+													axis.title.y = element_text(size = 16),
+													axis.text.x = element_text(size = 16),
+													axis.text.y = element_text(size = 16),
+													strip.text = element_text(size = 16),
+													strip.text.y = element_text(face="bold"),
+													strip.background = element_blank()) + 
+	guides(color = guide_colourbar(title.position = "bottom", label.position = "left"))+
+	geom_density_2d(size = 0.8 , colour = "#b8b8b7", alpha = 0.8) + 
+	scale_color_viridis(option = "mako", direction = -1)+
+	facet_rep_grid(celltype~plot, labeller = as_labeller(labels_plot), scales = "free", repeat.tick.labels = TRUE) 
+
+```
+

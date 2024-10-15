@@ -1,0 +1,128 @@
+---
+title: "Supplemental_Figure_10"
+date: "2024-10-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      fig.width = 15,
+                      fig.height = 15)
+
+
+source('../libraries.R')
+
+```
+
+
+# Supplemental Figure 10a-c
+
+```{r}
+sfigure_10_a <- read_excel("Source_Data_Extended_Data_Figure_10.xlsx", sheet = 'ExtDataFig10a-c' )
+sfigure_10_a$da_RNA_lfc <- as.numeric(sfigure_10_a$da_RNA_lfc)
+```
+
+
+```{r}
+CAGE_daRNA_plot <-
+	ggscatter(
+		sfigure_10_a,
+		x = "peak_CAGE_l2fc",
+		y = "da_RNA_lfc",
+		cor.coef = FALSE,
+		conf.int = FALSE,
+		cor.method = "spearman",
+		color = "#b8b8b7",
+		alpha = 0.7,
+		size = 1.5,
+	) +
+	geom_smooth(method = lm, colour = "#899DA4") +
+	stat_quadrant_counts(color = "#899DA4", size = 6) +
+	geom_hline(yintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	stat_cor(method ="spearman", color = "#899DA4", label.x = -3, label.y = -5.65, size = 6) +
+	geom_vline(xintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	labs(x = expression(paste("CAGE peak(Log"[2], "FC)")),
+			 y = expression(paste("daRNA(Log"[2], "FC)"))) +
+	# scale_x_continuous(limits = c(min(sfigure_10_a$peak_CAGE_l2fc), max(sfigure_10_a$peak_CAGE_l2fc)), breaks = seq(-6, 8, by =2)) +
+	# scale_y_continuous(limits = c(min(sfigure_10_a$da_RNA_lfc), max(sfigure_10_a$da_RNA_lfc)), breaks = seq(-6, 8, by =2)) +
+	theme_classic() + theme(
+		axis.title.x = element_text(size = 16),
+		axis.title.y = element_text(size = 16),
+		axis.text.x = element_text(size = 18),
+		axis.text.y = element_text(size = 18)
+	) + geom_density_2d(size = 1, colour = "#899DA4")
+
+
+Quant_daRNA_plot <-
+	ggscatter(
+		sfigure_10_a,
+		x = "peak_Quant_l2fc",
+		y = "da_RNA_lfc",
+		cor.coef = FALSE,
+		conf.int = FALSE,
+		cor.method = "spearman",
+		color = "#b8b8b7",
+		alpha = 0.7,
+		size = 1.5,
+	) +
+	geom_smooth(method = lm, colour = "#899DA4") +
+	#scale_x_log10() +
+	stat_quadrant_counts(color = "#899DA4", size = 6) +
+	geom_hline(yintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	geom_vline(xintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	stat_cor(method ="spearman", color = "#899DA4", label.x = -3, label.y = -5.65, size = 6) +
+	labs(x = expression(paste("Quant peak(Log"[2], "FC)")),
+			 y = expression(paste("daRNA(Log"[2], "FC)"))) +
+	scale_x_continuous(limits = c(min(sfigure_10_a$peak_Quant_l2fc), max(sfigure_10_a$peak_Quant_l2fc)), breaks = seq(-6, 8, by =2)) +
+	scale_y_continuous(limits = c(min(sfigure_10_a$da_RNA_lfc), max(sfigure_10_a$da_RNA_lfc)), breaks = seq(-6, 8, by =2)) +
+	theme_classic() + theme(
+		axis.title.x = element_text(size = 16),
+		axis.title.y = element_text(size = 16),
+		axis.text.x = element_text(size = 18),
+		axis.text.y = element_text(size = 18)
+	) + geom_density_2d(size = 1, colour = "#899DA4")
+
+CAGE_Quant_plot <- ggscatter(
+	sfigure_10_a,
+	x = "peak_CAGE_l2fc",
+	y = "peak_Quant_l2fc",
+	cor.coef = FALSE,
+	conf.int = FALSE,
+	cor.method = "spearman",
+	color = "#b8b8b7",
+	alpha = 0.7,
+	size = 1.5,
+) +
+	geom_smooth(method = lm, colour = "#899DA4") +
+	#scale_x_log10() +
+	stat_quadrant_counts(color = "#899DA4", size = 6) +
+	geom_hline(yintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	geom_vline(xintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	stat_cor( method ="spearman", color = "#899DA4", label.x = -3, label.y = -5.65, size = 6) +
+	labs(x = expression(paste("CAGE peak(Log"[2], "FC)")),
+			 y = expression(paste("Quant peak(Log"[2], "FC)"))) +
+	scale_x_continuous(limits = c(min(sfigure_10_a$peak_CAGE_l2fc), max(sfigure_10_a$peak_CAGE_l2fc)), breaks = seq(-6, 8, by =2)) +
+	scale_y_continuous(limits = c(min(sfigure_10_a$peak_Quant_l2fc), max(sfigure_10_a$peak_Quant_l2fc)), breaks = seq(-6, 8, by =2)) +
+	theme_classic() + theme(
+		axis.title.x = element_text(size = 16),
+		axis.title.y = element_text(size = 16),
+		axis.text.x = element_text(size = 18),
+		axis.text.y = element_text(size = 18)
+	) + geom_density_2d(size = 1, colour = "#899DA4")
+
+
+ ggarrange(CAGE_daRNA_plot, Quant_daRNA_plot, CAGE_Quant_plot, ncol = 3,common.legend = TRUE)
+```

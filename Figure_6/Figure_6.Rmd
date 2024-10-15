@@ -1,0 +1,116 @@
+---
+title: "Figure_6"
+date: "2024-10-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      fig.width = 15,
+                      fig.height = 7)
+
+source('../libraries.R')
+
+```
+
+# Figure 6a
+
+```{r}
+
+figure_6_a <- read_excel("Source_Data_Figure_6.xlsx", sheet = 'Figure6a' )
+
+	ggscatter(
+		figure_6_a,
+		x = "first_peak_l2fc",
+		y = "second_peak_l2fc",
+		cor.coef = FALSE,
+		conf.int = FALSE,
+		cor.method = "spearman",
+		color = "#b8b8b7",
+		alpha = 0.7,
+		size = 1.5,
+	) +
+	geom_smooth(method = lm, colour = "#899DA4") +
+	stat_quadrant_counts(color = "#899DA4", size = 6) +
+	geom_hline(yintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	geom_vline(xintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	stat_cor(method ="spearman", color = "#899DA4", label.x = -3, label.y = -6.2, size = 6) + 
+	labs(x = expression(paste("hostTSS(Log"[2], "FC)")),
+			 y = expression(paste("daTSS(Log"[2], "FC)"))) +
+	scale_x_continuous(limits = c(-6.5, 8.5), breaks = seq(-6, 8, by =2)) +
+	scale_y_continuous(limits = c(-6.5, 8.5), breaks = seq(-6, 8, by =2)) +
+	facet_wrap(~celltype, scales = "free", labeller = as_labeller(c("a_MCF7" = "MCF-7", "b_U2OS" = "U2OS", "c_RPE1" = "RPE-1"))) +
+	theme_classic() + theme(
+		# panel.grid.major = element_line(),
+		axis.title.x = element_text(size = 16),
+		axis.title.y = element_text(size = 16),
+		axis.text.x = element_text(size = 18),
+		axis.text.y = element_text(size = 18),
+		strip.text = element_text(size = 16, face = "bold"),
+		strip.background = element_blank()) + 
+	geom_density_2d(size = 1, colour = "#899DA4")
+
+```
+
+# Figure 6e
+
+```{r, fig.width = 5, fig.height=5}
+
+figure_6_e <- read_excel("Source_Data_Figure_6.xlsx", sheet = 'Figure6e' )
+
+
+cells <- figure_6_e %>% group_by(celltype) %>%
+    count(SP) %>%
+    mutate(label = paste0("n = ", n))
+
+median <- figure_6_e %>%
+    group_by(celltype, SP) %>%
+    summarize(median = round(median(reads)))
+
+
+stat_test <- compare_means(reads ~ SP,  data = figure_6_e, method = "t.test")
+stat_test_filtered <- filter(
+    stat_test,
+    group1 == "b_ccP|noCpG" & group2 == "a_noccP|noCpG" |
+        group1 == "d_ccP|CpG" & group2 == "c_noccP|CpG"
+)
+
+
+ggplot(figure_6_e, aes(x = SP, y = reads, group = SP)) +
+		geom_violin(aes(color = SP, fill = SP),  adjust = 4)+
+		ylab("CAGE-seq TSS read count") + xlab("TSS part of")+
+		geom_boxplot(aes(x = as.numeric(factor(SP)), 
+										 y = reads), fill = "grey40",
+								 outlier.shape = NA,  width= 0.2)+
+		scale_fill_manual(values=c("#e1e1e0", "#b8b8b7", "#f8a9ba", "#EE4266"))+
+		scale_colour_manual(values=c("#e1e1e0", "#b8b8b7", "#f8a9ba", "#EE4266"))+
+		geom_text(data = filter(median, celltype == "MCF-7"), 
+							aes(label = median, y = median +1, 
+									x = as.numeric(factor(SP))+0.27),size = 4, color = "grey30") +
+		scale_x_discrete(labels=c("a_noccP|noCpG" = "noccP|noCpG",
+															"b_ccP|noCpG" = "ccP|noCpG",
+															"c_noccP|CpG" ="noccP|CpG",
+															"d_ccP|CpG" = "ccP|CpG")) +
+		scale_y_log10(labels = scales::comma, expand = c(0,0.2)) +
+		# stat_compare_means(method = "t.test", paired = FALSE, comparisons = my_comparisons, 
+		# 									 label = "p", label.y = c(5.5, 5.5))+
+		# ggsignif::geom_signif(test="t.test", comparisons = my_comparisons)+
+		stat_pvalue_manual(stat_test_filtered, label = "p.signif", tip.length = 0, color = "grey30",
+											 size = 4, y.position = 5.8)+
+		theme_classic() + theme(
+			axis.title.x = element_text(size = 18),
+			axis.title.y = element_text(size = 18),
+			axis.text.x = element_text(size = 18, angle = 90, vjust = 0.5, hjust=1),
+			axis.text.y = element_text(size = 18),
+			legend.position='none',
+			strip.text = element_text(size = 16, face = "bold"),
+			strip.background = element_blank(),
+			axis.ticks.x = element_blank()) +
+		geom_text(data = filter(cells, celltype == "MCF-7"), aes(y = 0.75, label = label, size = 20), color = "grey30")
+```
+

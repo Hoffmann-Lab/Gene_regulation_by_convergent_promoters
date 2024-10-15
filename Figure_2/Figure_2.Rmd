@@ -1,0 +1,67 @@
+---
+title: "Figure_2"
+date: "2025-10-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      fig.width = 7,
+                      fig.height = 7)
+
+source('../libraries.R')
+
+
+```
+
+# Figure 2a
+
+```{r}
+
+
+figure_2_a <- read_excel("Source_Data_Figure_2.xlsx", sheet = 'Figure_2_a' )
+
+
+ggscatter(
+		figure_2_a,
+		x = "log2FoldChange_sense",
+		y = "log2FoldChange_antisense",
+		cor.coef = FALSE,
+		conf.int = FALSE,
+		cor.method = "spearman",
+		color = "#b8b8b7",
+		alpha = 0.7,
+		size = 0.5,
+	) +
+	geom_smooth(method = lm, colour = "#899DA4", linewidth = 0.3) +
+	stat_quadrant_counts(color = "#899DA4", size = 7/.pt, family = 'arial') +
+	geom_hline(yintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	geom_vline(xintercept = 0,
+						 colour = "#899DA4",
+						 alpha = 0.7) +
+	stat_cor(method ="spearman", 
+					 color = "#899DA4", 
+					 label.x = -4, 
+					 label.y = 1.5, 
+					 label.sep = '\n',
+					 size = 7/.pt, 
+					 family = 'arial') + 
+	labs(x = expression(paste("ccP host strand(Log"[2], "FC)")),
+			 y = expression(paste("ccP antisense(Log"[2], "FC)")),
+			 title = 'GRO-seq') +
+	scale_x_continuous(limits = c(-4, 6), breaks = seq(-4, 6, by = 2)) +
+	scale_y_continuous(limits = c(-4.5, 6), breaks = seq(-6, 6, by = 2)) +
+	# scale_x_continuous(limits = c(min(x, na.rm = TRUE), max(x, na.rm = TRUE)), breaks = seq(-4, 8, by =2)) +
+	# scale_y_continuous(limits = c(min(y, na.rm = TRUE), max(y, na.rm = TRUE)), breaks = seq(-4, 8, by =2)) +
+	theme_classic() + theme(
+	    plot.title = element_text(size = 7, family = 'arial'),
+		axis.title = element_text(size = 7, family = 'arial'),
+		axis.text = element_text(size = 7, family = 'arial')
+	) + geom_density_2d(size = 0.3, colour = "#899DA4")
+
+
+```
+
