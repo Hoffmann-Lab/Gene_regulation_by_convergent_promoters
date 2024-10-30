@@ -1,5 +1,6 @@
 # Gene_regulation_by_convergent_promoters
 
+[![DOI](https://zenodo.org/badge/873027962.svg)](https://doi.org/10.5281/zenodo.14011612)
 
 Code for the publication "Gene regulation by convergent promoters".
 
